@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090d;
+    --surface: #0f1117;
+    --surface2: #171921;
+    --surface3: #1e2130;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6366f1;
+    --accent2: #818cf8;
+    --accent-glow: rgba(99,102,241,0.25);
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --r: 14px;
+    --r-sm: 8px;
+    --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ──── PRIVACY CONSENT OVERLAY ──── */
+  #privacy-overlay {
+    position: fixed; inset: 0;
+    background: rgba(8,9,13,0.97);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+  }
+  .privacy-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    max-width: 520px; width: 100%;
+    padding: 40px;
+    animation: slideUp 0.5s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 80px rgba(99,102,241,0.15);
+  }
+  .privacy-icon {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; margin-bottom: 24px;
+  }
+  .privacy-card h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 12px; color: var(--text);
+  }
+  .privacy-card p {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text2); margin-bottom: 16px;
+  }
+  .privacy-notice {
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: var(--r-sm);
+    padding: 14px 16px;
+    font-size: 13px; color: var(--text2);
+    margin-bottom: 28px; line-height: 1.6;
+  }
+  .privacy-notice strong { color: var(--accent2); }
+  .privacy-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-agree {
+    flex: 1; padding: 14px 24px;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
+    color: white; border: none; border-radius: var(--r-sm);
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
+    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+  }
+  .btn-agree:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(99,102,241,0.4); }
+  .btn-decline {
+    padding: 14px 20px;
+    background: transparent;
+    color: var(--text3); border: 1px solid var(--border);
+    border-radius: var(--r-sm); font-size: 14px; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: var(--transition);
+  }
+  .btn-decline:hover { color: var(--text2); border-color: rgba(255,255,255,0.15); }
+
+  /* ──── MAIN APP ──── */
+  #app { opacity: 0; transition: opacity 0.5s ease; }
+  #app.visible { opacity: 1; }
+
+  /* ──── AMBIENT BG ──── */
+  .ambient {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .ambient-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(100px); opacity: 0.12;
+    animation: drift 12s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: var(--accent); top: -200px; left: -150px; animation-delay: 0s; }
+  .orb2 { width: 400px; height: 400px; background: #a78bfa; bottom: -100px; right: -100px; animation-delay: -5s; }
+  .orb3 { width: 300px; height: 300px; background: #06b6d4; top: 40%; left: 40%; animation-delay: -9s; }
+
+  /* ──── HEADER ──── */
+  header {
+    position: relative; z-index: 10;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,9,13,0.8);
+    backdrop-filter: blur(12px);
+  }
+  .header-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 18px; color: var(--text);
+  }
+  .logo-dot {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .header-badge {
+    font-size: 12px; color: var(--text3);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: 20px;
+  }
+
+  /* ──── HERO ──── */
+  .hero {
+    position: relative; z-index: 10;
+    padding: 64px 24px 48px;
+    text-align: center;
+    max-width: 700px; margin: 0 auto;
+    animation: slideUp 0.6s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500;
+    color: var(--accent2);
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    margin-bottom: 24px; letter-spacing: 0.02em;
+  }
+  .hero-eyebrow span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 700; line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 30%, #94a3b8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p { font-size: 16px; color: var(--text2); line-height: 1.6; }
+
+  /* ──── SEARCH ──── */
+  .search-section {
+    position: relative; z-index: 10;
+    max-width: 620px; margin: 0 auto 48px;
+    padding: 0 24px;
+    animation: slideUp 0.7s cubic-bezier(0.4,0,0.2,1) 0.1s both;
+  }
+  .search-box {
+    position: relative; display: flex; gap: 10px;
+  }
+  .search-input-wrap { flex: 1; position: relative; }
+  .search-input-wrap::before {
+    content: '🔍';
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 16px; z-index: 1; opacity: 0.5;
+  }
+  .search-input {
+    width: 100%; padding: 16px 16px 16px 48px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--r); color: var(--text);
+    font-size: 15px; font-family: 'Inter', sans-serif;
+    outline: none; transition: var(--transition);
+    letter-spacing: 0.02em;
+  }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    background: var(--surface3);
+  }
+  .search-btn {
+    padding: 0 24px;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
+    color: white; border: none; border-radius: var(--r);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition); white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.25);
+  }
+  .search-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(99,102,241,0.35); }
+  .search-btn:active { transform: translateY(0); }
+  .search-hint {
+    font-size: 12px; color: var(--text3); margin-top: 10px; text-align: center;
+  }
+
+  /* ──── CONTENT ──── */
+  .content {
+    position: relative; z-index: 10;
+    max-width: 1100px; margin: 0 auto; padding: 0 24px 100px;
+  }
+
+  /* ──── STATUS MESSAGES ──── */
+  .status-msg {
+    text-align: center; padding: 48px 24px;
+    animation: fadeIn 0.3s ease;
+  }
+  .status-msg .status-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+  .status-msg h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .status-msg p { font-size: 14px; color: var(--text2); }
+  .status-msg.error h3 { color: var(--red); }
+  .status-msg.loading { color: var(--text2); }
+
+  /* ──── STUDENT CARD ──── */
+  .student-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 60px rgba(99,102,241,0.08);
+  }
+  .card-header {
+    padding: 28px 32px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(124,58,237,0.05));
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .avatar {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 700; color: white;
+    font-family: 'Space Grotesk', sans-serif;
+    flex-shrink: 0;
+  }
+  .card-header-info { flex: 1; }
+  .student-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--text);
+    margin-bottom: 6px;
+  }
+  .student-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+  .meta-badge {
+    font-size: 12px; font-weight: 500; padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .badge-roll {
+    background: rgba(99,102,241,0.15); color: var(--accent2);
+    border: 1px solid rgba(99,102,241,0.25);
+  }
+  .badge-gender {
+    background: rgba(52,211,153,0.1); color: var(--green);
+    border: 1px solid rgba(52,211,153,0.2);
+  }
+  .badge-category {
+    background: rgba(251,191,36,0.1); color: var(--yellow);
+    border: 1px solid rgba(251,191,36,0.2);
+  }
+
+  /* ──── CARD GRID ──── */
+  .card-body { padding: 28px 32px; }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    color: var(--text3); text-transform: uppercase;
+    margin-bottom: 16px; margin-top: 28px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::before { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-label:first-child { margin-top: 0; }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .info-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 14px 16px;
+    transition: var(--transition);
+  }
+  .info-item:hover {
+    border-color: rgba(99,102,241,0.3);
+    background: var(--surface3);
+  }
+  .info-label { font-size: 11px; color: var(--text3); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .info-value { font-size: 14px; color: var(--text); font-weight: 500; word-break: break-word; }
+  .info-value.redacted {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .redacted-blur {
+    filter: blur(6px); user-select: none;
+    cursor: default; opacity: 0.5; transition: var(--transition);
+    font-size: 13px;
+  }
+  .unlock-btn {
+    font-size: 11px; padding: 3px 8px;
+    border: 1px solid rgba(99,102,241,0.4);
+    border-radius: 4px; color: var(--accent2);
+    background: rgba(99,102,241,0.1);
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    transition: var(--transition); font-family: 'Inter', sans-serif;
+  }
+  .unlock-btn:hover { background: rgba(99,102,241,0.2); }
+  .null-value { color: var(--text3); font-style: italic; font-size: 13px; }
+
+  /* ──── SEARCH RESULTS ──── */
+  .results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .results-count {
+    font-size: 14px; color: var(--text2);
+  }
+  .results-count strong { color: var(--text); }
+  .result-list { display: flex; flex-direction: column; gap: 10px; }
+  .result-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; transition: var(--transition);
+    animation: slideUp 0.3s ease both;
+  }
+  .result-item:hover {
+    border-color: rgba(99,102,241,0.4);
+    background: var(--surface2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(99,102,241,0.1);
+  }
+  .result-avatar {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .result-info { flex: 1; }
+  .result-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .result-sub { font-size: 12px; color: var(--text3); }
+  .result-arrow { color: var(--text3); font-size: 18px; }
+
+  /* ──── STATS CARDS ──── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px; margin-bottom: 40px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px 24px;
+    transition: var(--transition);
+    animation: fadeIn 0.4s ease both;
+  }
+  .stat-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-2px); }
+  .stat-label { font-size: 12px; color: var(--text3); font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px; font-weight: 700;
+    background: linear-gradient(135deg, var(--text), var(--text2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  /* ──── BACK BTN ──── */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text2);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; margin-bottom: 24px;
+    transition: var(--transition); font-family: 'Inter', sans-serif;
+  }
+  .back-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* ──── WATERMARK ──── */
+  .watermark {
+    position: fixed; bottom: 16px; right: 16px;
+    font-size: 11px; color: var(--text3);
+    font-family: 'Space Grotesk', sans-serif;
+    display: flex; align-items: center; gap: 5px;
+    z-index: 100; letter-spacing: 0.04em;
+    opacity: 0.7;
+  }
+  .watermark .wm-dot {
+    width: 16px; height: 16px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    border-radius: 4px;
+  }
+
+  /* ──── LOADING SPINNER ──── */
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  /* ──── UNLOCK MODAL ──── */
+  #unlock-modal {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 500; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  #unlock-modal.open { display: flex; animation: fadeIn 0.2s ease; }
+  .unlock-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px;
+    max-width: 380px; width: 100%;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+  }
+  .unlock-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; }
+  .unlock-card p { font-size: 13px; color: var(--text2); margin-bottom: 24px; line-height: 1.6; }
+  .unlock-actions { display: flex; gap: 10px; }
+  .unlock-confirm {
+    flex: 1; padding: 12px;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
+    color: white; border: none; border-radius: var(--r-sm);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: var(--transition);
+  }
+  .unlock-confirm:hover { opacity: 0.9; }
+  .unlock-cancel {
+    padding: 12px 20px;
+    background: transparent; color: var(--text2);
+    border: 1px solid var(--border); border-radius: var(--r-sm);
+    font-size: 14px; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: var(--transition);
+  }
+  .unlock-cancel:hover { border-color: rgba(255,255,255,0.2); }
+
+  /* ──── ANIMATIONS ──── */
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
+  @keyframes drift { 0%,100% { transform: translate(0,0) } 50% { transform: translate(30px, 20px) } }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.3 } }
+
+  /* ──── STAGGERED ITEMS ──── */
+  .result-item:nth-child(1) { animation-delay: 0ms }
+  .result-item:nth-child(2) { animation-delay: 50ms }
+  .result-item:nth-child(3) { animation-delay: 100ms }
+  .result-item:nth-child(4) { animation-delay: 150ms }
+  .result-item:nth-child(5) { animation-delay: 200ms }
+  .result-item:nth-child(6) { animation-delay: 250ms }
+  .result-item:nth-child(7) { animation-delay: 300ms }
+  .result-item:nth-child(8) { animation-delay: 350ms }
+  .result-item:nth-child(9) { animation-delay: 400ms }
+  .result-item:nth-child(10) { animation-delay: 450ms }
+
+  @media (max-width: 600px) {
+    .card-header { padding: 20px; }
+    .card-body { padding: 20px; }
+    .search-box { flex-direction: column; }
+    .search-btn { padding: 14px; }
+    .hero { padding: 40px 24px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AMBIENT -->
+<div class="ambient">
+  <div class="ambient-orb orb1"></div>
+  <div class="ambient-orb orb2"></div>
+  <div class="ambient-orb orb3"></div>
+</div>
+
+<!-- PRIVACY CONSENT OVERLAY -->
+<div id="privacy-overlay">
+  <div class="privacy-card">
+    <div class="privacy-icon">🔐</div>
+    <h2>Data Privacy Notice</h2>
+    <p>This portal contains personal student information including names, contact details, addresses, and identification numbers.</p>
+    <div class="privacy-notice">
+      <strong>Before you continue:</strong> This data is strictly for authorized institutional use. Sensitive fields such as Aadhaar numbers and mobile numbers are hidden by default and require explicit confirmation to reveal. Unauthorized access or misuse of this data is prohibited.
+    </div>
+    <div class="privacy-actions">
+      <button class="btn-agree" onclick="agreePrivacy()">✓ I Understand &amp; Agree</button>
+      <button class="btn-decline" onclick="declinePrivacy()">Decline</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNLOCK MODAL -->
+<div id="unlock-modal">
+  <div class="unlock-card">
+    <div style="font-size:36px;margin-bottom:12px">🔓</div>
+    <h3>Reveal Sensitive Data?</h3>
+    <p>You're about to view a protected field. This action is for authorized users only and may be logged.</p>
+    <div class="unlock-actions">
+      <button class="unlock-confirm" onclick="confirmUnlock()">Yes, Reveal</button>
+      <button class="unlock-cancel" onclick="closeUnlockModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-dot">🎓</div>
+        StudentPortal
+      </div>
+      <div class="header-badge">Secure Access</div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span></span>
+      Academic Records System
+    </div>
+    <h1>Find Student Records</h1>
+    <p>Search by roll number, name, or location. All sensitive data is protected and requires consent to view.</p>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <input
+          id="search-input"
+          class="search-input"
+          type="text"
+          placeholder="Roll number, name, or place..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <button class="search-btn" onclick="doSearch()">Search →</button>
+    </div>
+    <div class="search-hint">Try "Y24CS3201" for a direct lookup, or type a name to browse</div>
+  </div>
+
+  <div class="content" id="content">
+    <!-- Stats on load -->
+    <div id="home-view">
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+    <div id="results-view" style="display:none"></div>
+    <div id="detail-view" style="display:none"></div>
+  </div>
+</div>
+
+<!-- WATERMARK -->
+<div class="watermark">
+  <div class="wm-dot"></div>
+  Made by Kexer
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────
+const API_BASE = '/api';  // Routes to api/index.py via vercel.json
+const SENSITIVE_FIELDS = ['aadhaar_no', 'mobile', 'dob'];
+const FIELD_LABELS = {
+  roll_number: 'Roll Number', student_id: 'Student ID', name: 'Full Name',
+  hall_ticket_no: 'Hall Ticket', aadhaar_no: 'Aadhaar No.', dob: 'Date of Birth',
+  gender: 'Gender', father_name: "Father's Name", mother_name: "Mother's Name",
+  address: 'Address', place: 'Place', pincode: 'PIN Code',
+  mobile: 'Mobile', email: 'Email', medium: 'Medium',
+  reservation_category: 'Category', spl_reservation: 'Special Reservation',
+  minority: 'Minority', std_code: 'STD Code'
+};
+const FIELD_SECTIONS = {
+  academic: ['roll_number','student_id','hall_ticket_no','medium','reservation_category','spl_reservation','minority'],
+  personal: ['name','gender','dob','father_name','mother_name'],
+  contact:  ['mobile','email','address','place','pincode','std_code'],
+  identity: ['aadhaar_no']
+};
+
+let currentUnlockTarget = null;
+
+// ── PRIVACY GATE ─────────────────────────────────────────────────────
+function agreePrivacy() {
+  sessionStorage.setItem('privacy_agreed', '1');
+  const overlay = document.getElementById('privacy-overlay');
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity 0.4s ease';
+  setTimeout(() => overlay.remove(), 400);
+  const app = document.getElementById('app');
+  app.classList.add('visible');
+  loadStats();
+}
+function declinePrivacy() {
+  document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:#64748b;font-size:15px">Access declined. Close this tab.</div>`;
+}
+
+// Check if already agreed this session
+if (sessionStorage.getItem('privacy_agreed')) {
+  document.getElementById('privacy-overlay').remove();
+  document.getElementById('app').classList.add('visible');
+  loadStats();
+}
+
+// ── UNLOCK MODAL ─────────────────────────────────────────────────────
+function openUnlockModal(targetId) {
+  currentUnlockTarget = targetId;
+  document.getElementById('unlock-modal').classList.add('open');
+}
+function closeUnlockModal() {
+  document.getElementById('unlock-modal').classList.remove('open');
+  currentUnlockTarget = null;
+}
+function confirmUnlock() {
+  if (!currentUnlockTarget) return;
+  const wrap = document.getElementById(currentUnlockTarget);
+  if (!wrap) return;
+  const blurred = wrap.querySelector('.redacted-blur');
+  const btn = wrap.querySelector('.unlock-btn');
+  if (blurred) {
+    blurred.style.filter = 'none';
+    blurred.style.opacity = '1';
+    blurred.style.cursor = 'text';
+    blurred.style.userSelect = 'text';
+  }
+  if (btn) btn.remove();
+  closeUnlockModal();
+}
+document.getElementById('unlock-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeUnlockModal();
+});
+
+// ── KEYBOARD SUPPORT ─────────────────────────────────────────────────
+document.getElementById('search-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+// ── STATS ─────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch(`${API_BASE}/stats`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const grid = document.getElementById('stats-grid');
+    const topCats = Object.entries(data.category_distribution)
+      .sort((a,b)=>b[1]-a[1]).slice(0,2);
+    const genderStr = Object.entries(data.gender_distribution)
+      .map(([k,v])=>`${v} ${k}`).join(' · ');
+    grid.innerHTML = `
+      <div class="stat-card" style="animation-delay:0ms">
+        <div class="stat-label">Total Students</div>
+        <div class="stat-value">${data.total_students}</div>
+      </div>
+      <div class="stat-card" style="animation-delay:80ms">
+        <div class="stat-label">Gender Split</div>
+        <div class="stat-value" style="font-size:18px;margin-top:6px">${genderStr}</div>
+      </div>
+      ${topCats.map(([cat,cnt],i)=>`
+        <div class="stat-card" style="animation-delay:${(i+2)*80}ms">
+          <div class="stat-label">${cat}</div>
+          <div class="stat-value">${cnt}</div>
+        </div>
+      `).join('')}
+    `;
+  } catch(e) { /* stats are optional */ }
+}
+
+// ── SEARCH ───────────────────────────────────────────────────────────
+async function doSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+
+  showView('results');
+  const rv = document.getElementById('results-view');
+  rv.innerHTML = `<div class="status-msg loading"><div class="spinner"></div><p>Searching records…</p></div>`;
+
+  // Try exact roll number first
+  const isExact = /^y\d{2}[a-z]{2}\d{4}$/i.test(q);
+  if (isExact) {
+    try {
+      const res = await fetch(`${API_BASE}/student/${encodeURIComponent(q)}`);
+      if (res.ok) {
+        const student = await res.json();
+        showDetail(student);
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Full search
+  try {
+    const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}&limit=20`);
+    if (!res.ok) throw new Error('Search failed');
+    const data = await res.json();
+
+    if (data.count === 0) {
+      rv.innerHTML = `<div class="status-msg error">
+        <span class="status-icon">🔍</span>
+        <h3>No results found</h3>
+        <p>No student matches "<strong>${escHtml(q)}</strong>". Try a different name or roll number.</p>
+      </div>`;
+      return;
+    }
+
+    if (data.count === 1) { showDetail(data.results[0]); return; }
+
+    rv.innerHTML = `
+      <div class="results-header">
+        <div class="results-count">Found <strong>${data.count}</strong> students matching "${escHtml(q)}"</div>
+      </div>
+      <div class="result-list">
+        ${data.results.map((s,i) => `
+          <div class="result-item" onclick='showDetail(${JSON.stringify(s)})' style="animation-delay:${i*40}ms">
+            <div class="result-avatar">${s.name.charAt(0)}</div>
+            <div class="result-info">
+              <div class="result-name">${escHtml(s.name)}</div>
+              <div class="result-sub">${escHtml(s.roll_number)} · ${escHtml(s.place||'—')}</div>
+            </div>
+            <div class="result-arrow">›</div>
+          </div>
+        `).join('')}
+      </div>`;
+  } catch(e) {
+    rv.innerHTML = `<div class="status-msg error">
+      <span class="status-icon">⚠️</span>
+      <h3>Connection Error</h3>
+      <p>Could not reach the API. Make sure the backend server is running.</p>
+    </div>`;
+  }
+}
+
+// ── DETAIL VIEW ───────────────────────────────────────────────────────
+function showDetail(student) {
+  showView('detail');
+  const dv = document.getElementById('detail-view');
+
+  function fieldHtml(key, value) {
+    const label = FIELD_LABELS[key] || key.replace(/_/g,' ');
+    const isSensitive = SENSITIVE_FIELDS.includes(key);
+    let valHtml;
+    if (value === null || value === undefined || value === '') {
+      valHtml = `<span class="null-value">Not provided</span>`;
+    } else if (isSensitive) {
+      const uid = `unlock_${key}_${Date.now()}`;
+      const masked = String(value).replace(/\d/g, '●');
+      valHtml = `<div class="info-value redacted" id="${uid}">
+        <span class="redacted-blur">${escHtml(String(value))}</span>
+        <button class="unlock-btn" onclick="openUnlockModal('${uid}')">Reveal</button>
+      </div>`;
+      return `<div class="info-item">
+        <div class="info-label">${label} 🔒</div>
+        ${valHtml}
+      </div>`;
+    } else {
+      valHtml = `<div class="info-value">${escHtml(String(value))}</div>`;
+    }
+    return `<div class="info-item">
+      <div class="info-label">${label}</div>
+      ${valHtml}
+    </div>`;
+  }
+
+  function section(title, keys) {
+    const items = keys.filter(k => student.hasOwnProperty(k));
+    if (!items.length) return '';
+    return `<div class="section-label">${title}</div>
+    <div class="info-grid">${items.map(k => fieldHtml(k, student[k])).join('')}</div>`;
+  }
+
+  const allSectionKeys = Object.values(FIELD_SECTIONS).flat();
+  const extraKeys = Object.keys(student).filter(k => !allSectionKeys.includes(k));
+
+  dv.innerHTML = `
+    <button class="back-btn" onclick="goBack()">← Back to results</button>
+    <div class="student-card">
+      <div class="card-header">
+        <div class="avatar">${student.name.charAt(0)}</div>
+        <div class="card-header-info">
+          <div class="student-name">${escHtml(student.name)}</div>
+          <div class="student-meta">
+            <span class="meta-badge badge-roll">${escHtml(student.roll_number||'—')}</span>
+            ${student.gender ? `<span class="meta-badge badge-gender">${escHtml(student.gender)}</span>` : ''}
+            ${student.reservation_category ? `<span class="meta-badge badge-category">${escHtml(student.reservation_category)}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        ${section('Academic Info', FIELD_SECTIONS.academic)}
+        ${section('Personal Details', FIELD_SECTIONS.personal)}
+        ${section('Contact & Address', FIELD_SECTIONS.contact)}
+        ${section('Identity (Sensitive)', FIELD_SECTIONS.identity)}
+        ${extraKeys.length ? section('Other', extraKeys) : ''}
+      </div>
+    </div>`;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+let lastView = 'home';
+function showView(view) {
+  lastView = view;
+  document.getElementById('home-view').style.display    = view==='home'    ? '' : 'none';
+  document.getElementById('results-view').style.display = view==='results' ? '' : 'none';
+  document.getElementById('detail-view').style.display  = view==='detail'  ? '' : 'none';
+}
+function goBack() {
+  showView('results');
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
