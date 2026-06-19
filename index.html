@@ -690,7 +690,15 @@ body::before{
 .sens-disclaimer-icon{font-size:14px;flex-shrink:0;padding-top:1px}
 .sens-disclaimer-text{font-size:11.5px;color:var(--text2);line-height:1.65}
 .sens-disclaimer-text strong{color:var(--amber);font-weight:600}
-.sensitive-wrap{display:flex;align-items:center;gap:8px}
+.sensitive-wrap{
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;border-radius:8px;padding:2px 4px;margin:-2px -4px;
+  transition:0.15s ease;
+}
+.sensitive-wrap:hover{background:rgba(245,158,11,0.06)}
+.sensitive-wrap:hover .sens-blur{filter:blur(4px)}
+.sensitive-wrap.revealed{cursor:default}
+.sensitive-wrap.revealed:hover{background:none}
 .sens-blur{
   filter:blur(5px);user-select:none;
   font-family:var(--font-mono);font-size:11px;
@@ -1601,10 +1609,10 @@ function showDetail(s){
     if(v===null||v===undefined||v===''){
       valHtml=`<div class="d-val nil">Not provided</div>`;
     } else if(isSens){
-      const id=`rev_${k}_${Date.now()+Math.random()}`;
-      valHtml=`<div class="sensitive-wrap" id="${id}">
+      const id=`rev_${k}_${Date.now()+Math.random()}`.replace('.','');
+      valHtml=`<div class="sensitive-wrap" id="${id}" onclick="askReveal('${id}')">
         <div class="sens-blur">${esc(String(v))}</div>
-        <button class="reveal-btn" onclick="askReveal('${id}')">Reveal</button>
+        <button class="reveal-btn" onclick="event.stopPropagation();askReveal('${id}')">Reveal</button>
       </div>`;
     } else {
       valHtml=`<div class="d-val${isMono?' mono':''}">${esc(String(v))}</div>`;
@@ -1618,20 +1626,20 @@ function showDetail(s){
   function section(title,keys){
     const ks=keys.filter(k=>s.hasOwnProperty(k));
     if(!ks.length)return'';
-    const isSensitiveSection=ks.some(k=>SENSITIVE.includes(k));
-    const disclaimer=isSensitiveSection?`
-      <div class="sens-disclaimer">
-        <div class="sens-disclaimer-icon">⚠️</div>
-        <div class="sens-disclaimer-text">
-          <strong>Restricted data — handle with care.</strong> This section contains government-issued ID, contact and date-of-birth details. View only if you are authorised to access this record, and do not copy, screenshot or share it outside official use.
-        </div>
-      </div>`:'';
     return `<div class="d-section">
       <div class="d-section-label">${title}</div>
-      ${disclaimer}
       <div class="d-grid">${ks.map(k=>field(k,s[k])).join('')}</div>
     </div>`;
   }
+
+  const hasSensitive=SENSITIVE.some(k=>s.hasOwnProperty(k)&&s[k]!==null&&s[k]!==undefined&&s[k]!=='');
+  const globalDisclaimer=hasSensitive?`
+    <div class="sens-disclaimer">
+      <div class="sens-disclaimer-icon">⚠️</div>
+      <div class="sens-disclaimer-text">
+        <strong>Restricted data — handle with care.</strong> This record contains government‑issued ID, contact and date‑of‑birth details. View only if you are authorised to access this record, and do not copy, screenshot or share it outside official use.
+      </div>
+    </div>`:'';
 
   el.innerHTML=`
     <div class="back-btn" onclick="goBack()">
@@ -1652,6 +1660,7 @@ function showDetail(s){
       </div>
     </div>
     <div class="d-body">
+      ${globalDisclaimer}
       ${section('Academic',SECTIONS['Academic'])}
       ${section('Personal',SECTIONS['Personal'])}
       ${section('Contact & Address',SECTIONS['Contact'])}
@@ -1689,6 +1698,9 @@ function confirmReveal(){
     const btn=wrap.querySelector('.reveal-btn');
     if(blur){blur.style.filter='none';blur.style.userSelect='text';}
     if(btn)btn.remove();
+    wrap.onclick=null;
+    wrap.style.cursor='default';
+    wrap.classList.add('revealed');
     if(!wrap.parentElement.querySelector('.reveal-note')){
       const note=document.createElement('div');
       note.className='reveal-note';
