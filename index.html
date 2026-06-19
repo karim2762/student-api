@@ -106,12 +106,43 @@ body::before{
   background:var(--bg);
   display:flex;align-items:center;justify-content:center;
   padding:24px;
+  overflow:hidden;
+}
+#gate::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 60% 50% at 50% 40%,black,transparent);
 }
 .gate-inner{
-  max-width:460px;width:100%;
+  max-width:480px;width:100%;position:relative;z-index:1;
+  background:linear-gradient(160deg,var(--surface) 0%,var(--surface2) 100%);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  padding:44px 40px 36px;
+  box-shadow:0 40px 100px rgba(0,0,0,0.55),0 0 80px rgba(59,130,246,0.05);
   opacity:0;transform:translateY(24px);
-  animation:riseIn 0.7s 0.2s cubic-bezier(0.22,1,0.36,1) forwards;
+  animation:riseIn 0.7s 0.1s cubic-bezier(0.22,1,0.36,1) forwards;
 }
+.gate-shield{
+  position:relative;width:72px;height:72px;margin:0 auto 26px;
+  opacity:0;animation:fadeUp 0.6s 0.2s ease forwards;
+}
+.gate-shield-ring{
+  position:absolute;inset:0;border-radius:50%;border:1px solid rgba(59,130,246,0.18);
+  animation:spinSlow 14s linear infinite;
+}
+.gate-shield-ring.r2{inset:8px;border-color:rgba(99,102,241,0.15);animation-duration:20s;animation-direction:reverse}
+.gate-shield-core{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:42px;height:42px;border-radius:13px;
+  background:linear-gradient(135deg,var(--blue),var(--indigo));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 32px var(--blue-glow2);
+}
+.gate-shield-core svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2}
 .gate-badge{
   display:inline-flex;align-items:center;gap:8px;
   font-family:var(--font-mono);font-size:10px;letter-spacing:0.2em;
@@ -119,14 +150,17 @@ body::before{
   background:var(--blue-dim);
   border:1px solid rgba(59,130,246,0.2);
   border-radius:100px;padding:6px 14px;
-  margin-bottom:32px;
+  margin-bottom:20px;
+  opacity:0;animation:fadeUp 0.5s 0.3s ease forwards;
 }
+.gate-badge-row{text-align:center}
 .gate-badge-dot{width:6px;height:6px;background:var(--blue);border-radius:50%;animation:pulseGlow 2s ease infinite}
 .gate-title{
   font-family:var(--font-head);
-  font-size:38px;font-weight:700;
-  line-height:1.1;margin-bottom:14px;
-  letter-spacing:-0.02em;
+  font-size:34px;font-weight:700;
+  line-height:1.15;margin-bottom:14px;
+  letter-spacing:-0.02em;text-align:center;
+  opacity:0;animation:fadeUp 0.5s 0.4s ease forwards;
 }
 .gate-title span{
   background:linear-gradient(135deg,var(--blue-light),var(--indigo));
@@ -135,7 +169,8 @@ body::before{
 }
 .gate-desc{
   font-size:14px;color:var(--text2);
-  line-height:1.8;margin-bottom:24px;font-weight:400;
+  line-height:1.8;margin-bottom:24px;font-weight:400;text-align:center;
+  opacity:0;animation:fadeUp 0.5s 0.5s ease forwards;
 }
 .gate-warning{
   display:flex;gap:14px;
@@ -143,12 +178,16 @@ body::before{
   border:1px solid rgba(245,158,11,0.15);
   border-radius:var(--radius);
   padding:16px 18px;
-  margin-bottom:32px;
+  margin-bottom:28px;
+  opacity:0;animation:fadeUp 0.5s 0.6s ease forwards;
 }
 .gate-warning-icon{font-size:16px;flex-shrink:0;padding-top:1px}
 .gate-warning-text{font-size:13px;color:var(--text2);line-height:1.7}
 .gate-warning-text strong{color:var(--amber);display:block;margin-bottom:3px;font-size:12px;letter-spacing:0.05em;text-transform:uppercase}
-.gate-actions{display:flex;gap:10px}
+.gate-actions{
+  display:flex;gap:10px;
+  opacity:0;animation:fadeUp 0.5s 0.7s ease forwards;
+}
 .btn-primary{
   flex:1;padding:15px 20px;
   background:linear-gradient(135deg,var(--blue),var(--indigo));
@@ -156,7 +195,7 @@ body::before{
   font-family:var(--font-ui);font-size:14px;font-weight:600;
   cursor:pointer;transition:0.25s ease;
   letter-spacing:0.01em;
-  box-shadow:0 0 0 0 var(--blue-glow);
+  box-shadow:0 4px 20px var(--blue-glow);
   position:relative;overflow:hidden;
 }
 .btn-primary::after{
@@ -274,6 +313,17 @@ body::before{
 .topbar-right{
   display:flex;align-items:center;gap:14px;
 }
+.topbar-nav-link{
+  font-family:var(--font-ui);font-size:12.5px;font-weight:500;
+  color:var(--text2);text-decoration:none;letter-spacing:0.01em;
+  padding:6px 4px;position:relative;transition:0.2s ease;
+}
+.topbar-nav-link::after{
+  content:'';position:absolute;left:0;right:100%;bottom:0;
+  height:1.5px;background:var(--blue);transition:right 0.25s ease;
+}
+.topbar-nav-link:hover{color:var(--text)}
+.topbar-nav-link:hover::after{right:0}
 .status-pill{
   display:flex;align-items:center;gap:6px;
   font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;
@@ -296,7 +346,6 @@ body::before{
   padding-top:58px;
 }
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
-.left-panel,.right-panel{padding-bottom:58px}
 
 /* ── LEFT PANEL ──────────────────────────────── */
 .left-panel{
@@ -389,7 +438,7 @@ body::before{
   border-radius:var(--radius-sm);padding:14px 16px;
   transition:0.2s ease;
 }
-.stat-card:hover{border-color:var(--border2)}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.25)}
 .stat-n{
   font-family:var(--font-head);
   font-size:26px;font-weight:700;color:var(--text);
@@ -463,6 +512,17 @@ body::before{
   color:var(--text2);margin-bottom:8px;letter-spacing:-0.01em;
 }
 .idle-p{font-size:13px;color:var(--text3);line-height:1.75;max-width:260px}
+.idle-scrolldown{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:28px;padding:9px 16px;
+  border:1px solid var(--border2);border-radius:100px;
+  background:var(--surface2);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;
+  color:var(--text2);cursor:pointer;
+  transition:0.2s ease;
+}
+.idle-scrolldown:hover{border-color:var(--blue);color:var(--blue-light);background:var(--blue-dim)}
+.idle-scrolldown svg{width:13px;height:13px;animation:bounceDown 1.6s ease infinite}
 
 /* ── LOADING ─────────────────────────────────── */
 .loading-state{
@@ -493,6 +553,7 @@ body::before{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:20px;padding-bottom:16px;
   border-bottom:1px solid var(--border);
+  animation:riseIn 0.4s ease both;
 }
 .results-label{
   font-family:var(--font-mono);font-size:10px;letter-spacing:0.16em;
@@ -553,6 +614,7 @@ body::before{
   border:1px solid var(--border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;
   padding:28px 30px;border-bottom:none;
   position:relative;overflow:hidden;
+  animation:scaleIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
 }
 .d-header::before{
   content:'';position:absolute;top:-60px;right:-60px;
@@ -577,7 +639,9 @@ body::before{
 .badge{
   font-family:var(--font-mono);font-size:9px;letter-spacing:0.08em;
   padding:4px 10px;border-radius:100px;text-transform:uppercase;font-weight:500;
+  transition:0.2s ease;
 }
+.badge:hover{transform:translateY(-1px)}
 .badge-roll{background:var(--blue-dim);color:var(--blue-light);border:1px solid rgba(59,130,246,0.2)}
 .badge-gender{background:rgba(16,185,129,0.08);color:var(--green);border:1px solid rgba(16,185,129,0.15)}
 .badge-cat{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,0.15)}
@@ -615,6 +679,17 @@ body::before{
 .d-val.mono{font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em}
 .d-val.nil{color:var(--text3);font-style:italic;font-size:12px}
 .d-label.sens{color:var(--amber);opacity:0.8}
+.sens-disclaimer{
+  display:flex;gap:12px;align-items:flex-start;
+  background:rgba(245,158,11,0.06);
+  border:1px solid rgba(245,158,11,0.18);
+  border-radius:var(--radius-sm);
+  padding:13px 16px;margin-bottom:14px;
+  animation:riseIn 0.4s ease both;
+}
+.sens-disclaimer-icon{font-size:14px;flex-shrink:0;padding-top:1px}
+.sens-disclaimer-text{font-size:11.5px;color:var(--text2);line-height:1.65}
+.sens-disclaimer-text strong{color:var(--amber);font-weight:600}
 .sensitive-wrap{display:flex;align-items:center;gap:8px}
 .sens-blur{
   filter:blur(5px);user-select:none;
@@ -631,6 +706,13 @@ body::before{
   transition:0.15s ease;font-weight:500;
 }
 .reveal-btn:hover{background:rgba(245,158,11,0.15)}
+.reveal-note{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:0.05em;
+  color:var(--amber);opacity:0.75;margin-top:6px;
+  display:flex;align-items:center;gap:5px;
+  animation:fadeUp 0.3s ease both;
+}
+.reveal-note::before{content:'🔓';font-size:9px}
 
 /* ── ERROR STATE ─────────────────────────────── */
 .err-state{
@@ -689,60 +771,288 @@ body::before{
 }
 .unlock-no:hover{color:var(--text2)}
 
-/* ── SOCIAL BAR ──────────────────────────────── */
-.social-bar{
-  position:fixed;bottom:0;left:0;right:0;z-index:20;
-  height:42px;
-  display:flex;align-items:center;justify-content:center;gap:14px;
-  background:rgba(2,4,8,0.82);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-top:1px solid var(--border);
-  font-family:var(--font-mono);font-size:10px;
-}
-.social-bar-label{
-  color:var(--text3);letter-spacing:0.06em;
-}
-.social-sep{color:var(--border2)}
-.social-link{
-  display:inline-flex;align-items:center;gap:6px;
-  font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;
-  text-decoration:none;border-radius:100px;
-  padding:5px 12px;border:1px solid;
-  transition:0.2s ease;font-weight:500;
-}
-.social-link svg{width:13px;height:13px;flex-shrink:0}
-.social-link.insta{
-  color:#e1306c;border-color:rgba(225,48,108,0.2);
-  background:rgba(225,48,108,0.06);
-}
-.social-link.insta:hover{background:rgba(225,48,108,0.14);border-color:rgba(225,48,108,0.4);box-shadow:0 0 14px rgba(225,48,108,0.15)}
-.social-link.tg{
-  color:#29b6f6;border-color:rgba(41,182,246,0.2);
-  background:rgba(41,182,246,0.06);
-}
-.social-link.tg:hover{background:rgba(41,182,246,0.14);border-color:rgba(41,182,246,0.4);box-shadow:0 0 14px rgba(41,182,246,0.15)}
+/* ── WATERMARK ───────────────────────────────── */
+.wm{display:none}
+.wm-mark{display:none}
 
-/* ── UNLOCK MODAL SOCIAL BUTTONS ─────────────── */
-.unlock-socials{
-  display:flex;flex-direction:column;gap:10px;margin-bottom:16px;
+/* ── SOCIAL FOOTER ───────────────────────────── */
+.social-footer{
+  position:relative;z-index:20;
+  background:var(--surface);
+  border-top:1px solid var(--border2);
+  padding:32px 48px 28px;
+  display:flex;flex-direction:column;
+  align-items:center;gap:24px;
 }
-.unlock-social-btn{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  text-decoration:none;border-radius:var(--radius-sm);
-  padding:13px;font-family:var(--font-ui);font-size:14px;font-weight:600;
-  border:1px solid;transition:0.2s ease;
+.social-footer-top{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:900px;flex-wrap:wrap;gap:20px;
 }
-.unlock-social-btn svg{width:18px;height:18px;flex-shrink:0}
-.unlock-social-btn.insta{
-  color:#e1306c;border-color:rgba(225,48,108,0.25);
-  background:rgba(225,48,108,0.08);
+.sf-brand{display:flex;align-items:center;gap:10px}
+.sf-brand-icon{
+  width:32px;height:32px;
+  background:linear-gradient(135deg,var(--blue),var(--indigo));
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px var(--blue-glow);
+  flex-shrink:0;
 }
-.unlock-social-btn.insta:hover{background:rgba(225,48,108,0.16);box-shadow:0 4px 20px rgba(225,48,108,0.2)}
-.unlock-social-btn.tg{
-  color:#29b6f6;border-color:rgba(41,182,246,0.25);
-  background:rgba(41,182,246,0.08);
+.sf-brand-icon svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.2}
+.sf-brand-info{}
+.sf-brand-name{
+  font-family:var(--font-head);font-size:14px;font-weight:600;
+  color:var(--text);letter-spacing:-0.01em;line-height:1;margin-bottom:3px;
 }
-.unlock-social-btn.tg:hover{background:rgba(41,182,246,0.16);box-shadow:0 4px 20px rgba(41,182,246,0.2)}
+.sf-brand-tag{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:0.15em;
+  color:var(--text3);text-transform:uppercase;
+}
+.sf-links{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.sf-link{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 14px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border2);
+  background:var(--surface2);
+  color:var(--text2);
+  text-decoration:none;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;
+  transition:all 0.2s ease;
+  white-space:nowrap;
+}
+.sf-link svg{width:14px;height:14px;flex-shrink:0;transition:0.2s ease}
+.sf-link:hover{color:#fff;transform:translateY(-2px)}
+.sf-link.instagram:hover{
+  border-color:rgba(225,48,108,0.5);
+  background:rgba(225,48,108,0.1);
+  box-shadow:0 4px 20px rgba(225,48,108,0.2);
+}
+.sf-link.instagram:hover svg{color:#e1306c}
+.sf-link.telegram:hover{
+  border-color:rgba(0,136,204,0.5);
+  background:rgba(0,136,204,0.1);
+  box-shadow:0 4px 20px rgba(0,136,204,0.2);
+}
+.sf-link.telegram:hover svg{color:#0088cc}
+.sf-link.github:hover{
+  border-color:rgba(99,179,237,0.4);
+  background:rgba(99,179,237,0.08);
+  box-shadow:0 4px 20px rgba(99,179,237,0.15);
+}
+.sf-link.github:hover svg{color:var(--blue-light)}
+
+/* contact us card */
+.sf-contact{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;
+  padding:22px 26px;
+  background:linear-gradient(135deg,rgba(59,130,246,0.05),rgba(99,102,241,0.04));
+  border:1px solid rgba(59,130,246,0.14);
+  border-radius:var(--radius-lg);
+  width:100%;max-width:900px;
+  position:relative;overflow:hidden;
+  transition:0.25s ease;
+}
+.sf-contact::before{
+  content:'';position:absolute;top:-50%;left:-10%;
+  width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,var(--blue-dim),transparent 70%);
+  pointer-events:none;
+}
+.sf-contact:hover{border-color:rgba(59,130,246,0.28)}
+.sf-contact-head{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.sf-contact-icon{
+  width:40px;height:40px;
+  background:var(--blue-dim);border:1px solid rgba(59,130,246,0.25);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.sf-contact-icon svg{width:17px;height:17px;fill:none;stroke:var(--blue-light);stroke-width:2}
+.sf-contact-text{display:flex;flex-direction:column;gap:4px}
+.sf-contact-text strong{
+  color:var(--text);font-weight:700;font-size:14px;
+  font-family:var(--font-head);letter-spacing:-0.01em;
+}
+.sf-contact-text span{font-size:12px;color:var(--text2);line-height:1.6;max-width:320px}
+.sf-contact-acts{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+.sf-contact-link{
+  display:flex;align-items:center;gap:7px;
+  padding:11px 18px;
+  color:#fff;text-decoration:none;border-radius:var(--radius-sm);
+  font-family:var(--font-ui);font-size:12px;letter-spacing:0.02em;
+  font-weight:600;transition:0.2s ease;white-space:nowrap;
+}
+.sf-contact-link.insta{
+  background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af);
+  box-shadow:0 4px 16px rgba(225,48,108,0.25);
+}
+.sf-contact-link.tg{
+  background:linear-gradient(135deg,#34a3df,#0088cc);
+  box-shadow:0 4px 16px rgba(0,136,204,0.25);
+}
+.sf-contact-link:hover{transform:translateY(-2px) scale(1.02)}
+.sf-contact-link.insta:hover{box-shadow:0 8px 26px rgba(225,48,108,0.4)}
+.sf-contact-link.tg:hover{box-shadow:0 8px 26px rgba(0,136,204,0.4)}
+.sf-contact-link svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:2.2;flex-shrink:0}
+@media(max-width:560px){
+  .sf-contact{padding:20px}
+  .sf-contact-text span{max-width:none}
+  .sf-contact-acts{width:100%}
+  .sf-contact-link{flex:1;justify-content:center}
+}
+
+/* bottom credit row */
+.sf-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:900px;flex-wrap:wrap;gap:10px;
+  padding-top:20px;
+  border-top:1px solid var(--border);
+}
+.sf-copy{
+  font-family:var(--font-mono);font-size:9px;
+  color:var(--text3);letter-spacing:0.1em;
+  display:flex;align-items:center;gap:6px;
+}
+.sf-copy-dot{
+  width:10px;height:10px;
+  background:linear-gradient(135deg,var(--blue),var(--indigo));
+  border-radius:3px;flex-shrink:0;
+}
+.sf-insta-preview{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 12px;
+  border-radius:6px;
+  background:linear-gradient(135deg,rgba(225,48,108,0.08),rgba(131,58,180,0.08));
+  border:1px solid rgba(225,48,108,0.2);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:0.08em;
+  color:#e1306c;
+}
+.sf-insta-preview svg{width:12px;height:12px;flex-shrink:0}
+.sf-insta-pulse{
+  width:5px;height:5px;border-radius:50%;
+  background:#e1306c;
+  animation:pulseGlow 2.5s ease infinite;
+}
+
+@media(max-width:900px){
+  .social-footer{padding:24px 20px 20px}
+  .sf-links{gap:6px}
+  .sf-link{padding:8px 11px;font-size:9px}
+}
+
+/* ── INFO / ABOUT SECTION ─────────────────────── */
+.info-section{
+  position:relative;z-index:10;
+  padding:96px 48px 100px;
+  border-top:1px solid var(--border);
+  background:
+    radial-gradient(ellipse 700px 400px at 15% 0%,rgba(59,130,246,0.05),transparent 60%),
+    linear-gradient(180deg,var(--bg) 0%,var(--surface) 100%);
+  scroll-margin-top:58px;
+  overflow:hidden;
+}
+.info-inner{max-width:880px;margin:0 auto;position:relative;z-index:1}
+.info-eyebrow-row{
+  display:flex;align-items:center;gap:14px;margin-bottom:22px;
+  opacity:0;transform:translateY(10px);
+}
+.info-eyebrow-row.in-view{animation:fadeUp 0.6s ease forwards}
+.info-eyebrow-num{
+  font-family:var(--font-mono);font-size:11px;color:var(--blue-light);
+  background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);
+  border-radius:100px;padding:5px 12px;letter-spacing:0.1em;
+}
+.info-heading{
+  font-family:var(--font-head);font-size:clamp(26px,3.8vw,40px);
+  font-weight:700;letter-spacing:-0.02em;line-height:1.2;
+  margin-bottom:18px;color:var(--text);max-width:600px;
+  opacity:0;transform:translateY(14px);
+}
+.info-heading.in-view{animation:fadeUp 0.6s 0.1s ease forwards}
+.info-heading span{
+  background:linear-gradient(135deg,var(--blue-light),var(--indigo));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.info-intro{
+  font-size:14px;color:var(--text3);line-height:1.8;max-width:520px;margin-bottom:64px;
+  opacity:0;transform:translateY(14px);
+}
+.info-intro.in-view{animation:fadeUp 0.6s 0.2s ease forwards}
+
+/* timeline */
+.info-timeline{position:relative;padding-left:64px}
+.info-rail{
+  position:absolute;left:23px;top:6px;bottom:6px;width:2px;
+  background:var(--border2);border-radius:2px;
+}
+.info-rail-fill{
+  position:absolute;top:0;left:0;width:100%;height:0%;
+  background:linear-gradient(180deg,var(--blue),var(--indigo));
+  border-radius:2px;transition:height 0.7s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:0 0 12px var(--blue-glow);
+}
+.info-item{
+  position:relative;padding-bottom:52px;
+  opacity:0;transform:translateX(-22px);
+}
+.info-item:last-child{padding-bottom:0}
+.info-item.in-view{animation:slideInLeft 0.55s cubic-bezier(0.22,1,0.36,1) forwards}
+.info-node{
+  position:absolute;left:-64px;top:0;
+  width:47px;height:47px;
+  background:var(--surface2);border:2px solid var(--border2);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:0.35s ease;z-index:2;
+}
+.info-item.in-view .info-node{
+  border-color:var(--blue);background:var(--surface3);
+  box-shadow:0 0 0 5px var(--blue-dim),0 0 20px var(--blue-glow);
+}
+.info-node svg{width:18px;height:18px;color:var(--text3);transition:0.35s ease}
+.info-item.in-view .info-node svg{color:var(--blue-light)}
+.info-item-body{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px 24px;
+  transition:0.25s ease;position:relative;
+}
+.info-item-body:hover{border-color:var(--border3);background:var(--surface2);transform:translateX(4px)}
+.info-item-tag{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:8px;
+}
+.info-item h3{
+  font-family:var(--font-head);font-size:17px;font-weight:600;
+  color:var(--text);margin-bottom:9px;letter-spacing:-0.01em;
+}
+.info-item p{font-size:13px;color:var(--text2);line-height:1.75;max-width:520px}
+.info-item p code{
+  font-family:var(--font-mono);font-size:11.5px;color:var(--blue-light);
+  background:var(--blue-dim);padding:1px 6px;border-radius:4px;
+}
+.info-item.warn .info-node{border-color:rgba(245,158,11,0.4)}
+.info-item.warn.in-view .info-node{
+  border-color:var(--amber);box-shadow:0 0 0 5px var(--amber-dim),0 0 20px rgba(245,158,11,0.25);
+}
+.info-item.warn.in-view .info-node svg{color:var(--amber)}
+.info-jump{
+  display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.05em;
+  color:var(--blue-light);text-decoration:none;cursor:pointer;
+  transition:0.2s ease;
+}
+.info-jump:hover{gap:9px;color:#fff}
+.info-jump svg{width:11px;height:11px;transition:0.2s ease}
+@media(max-width:640px){
+  .info-section{padding:64px 20px 64px}
+  .info-timeline{padding-left:50px}
+  .info-rail{left:17px}
+  .info-node{left:-50px;width:36px;height:36px}
+  .info-node svg{width:15px;height:15px}
+}
 
 /* ── KEYFRAMES ───────────────────────────────── */
 @keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -752,6 +1062,9 @@ body::before{
 @keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:scale(1)}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:translateX(0)}}
 
 @media(prefers-reduced-motion:reduce){
   *{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
@@ -771,9 +1084,18 @@ body::before{
 <!-- PRIVACY GATE -->
 <div id="gate">
   <div class="gate-inner">
-    <div class="gate-badge">
-      <span class="gate-badge-dot"></span>
-      Secured Portal
+    <div class="gate-shield">
+      <div class="gate-shield-ring"></div>
+      <div class="gate-shield-ring r2"></div>
+      <div class="gate-shield-core">
+        <svg viewBox="0 0 24 24"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+    </div>
+    <div class="gate-badge-row">
+      <div class="gate-badge">
+        <span class="gate-badge-dot"></span>
+        Secured Portal
+      </div>
     </div>
     <h1 class="gate-title">Authorised<br><span>Access Only</span></h1>
     <p class="gate-desc">This portal contains personal student records including identification numbers, contact details, and addresses. Access is restricted to authorised institutional personnel only.</p>
@@ -785,8 +1107,8 @@ body::before{
       </div>
     </div>
     <div class="gate-actions">
-      <button class="btn-primary" onclick="agreeGate()">I Understand — Continue</button>
       <button class="btn-ghost" onclick="denyGate()">Decline</button>
+      <button class="btn-primary" onclick="agreeGate()">I Understand — Continue</button>
     </div>
   </div>
 </div>
@@ -809,20 +1131,13 @@ body::before{
 <!-- UNLOCK MODAL -->
 <div id="unlock-modal">
   <div class="unlock-card">
-    <div class="unlock-icon-wrap">🔒</div>
-    <h3>Follow Admin to Unlock</h3>
-    <p>To view protected data, follow the admin on Instagram. For more information about any student, contact admin directly.</p>
-    <div class="unlock-socials">
-      <a class="unlock-social-btn insta" href="https://instagram.com/kexer.vx" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        @kexer.vx
-      </a>
-      <a class="unlock-social-btn tg" href="https://t.me/Kexer_hub" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 14.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
-        @Kexer_hub
-      </a>
+    <div class="unlock-icon-wrap">🔓</div>
+    <h3>Reveal Protected Field?</h3>
+    <p>This field contains sensitive personal data. By revealing it, you confirm you are authorised to view this information and accept responsibility for handling it in line with your institution's data‑privacy policy. Do not screenshot, copy, or share revealed data.</p>
+    <div class="unlock-acts">
+      <button class="unlock-yes" onclick="confirmReveal()">Reveal Field</button>
+      <button class="unlock-no" onclick="closeModal()">Cancel</button>
     </div>
-    <button class="unlock-no" style="width:100%;margin-top:4px" onclick="closeModal()">Close</button>
   </div>
 </div>
 
@@ -840,6 +1155,7 @@ body::before{
       <div class="topbar-meta">Records Management System</div>
     </div>
     <div class="topbar-right">
+      <a class="topbar-nav-link" href="#info-section" onclick="event.preventDefault();scrollToInfo()">About</a>
       <div class="status-pill">
         <span class="status-dot"></span>
         Live
@@ -907,25 +1223,162 @@ body::before{
         </div>
         <div class="idle-h">Ready to search</div>
         <div class="idle-p">Enter a roll number, student name, or city to get started.</div>
+        <div class="idle-scrolldown" onclick="scrollToInfo()">
+          <span>More about this portal</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </div>
       </div>
       <div id="view-results" style="display:none"></div>
       <div id="view-detail" style="display:none"></div>
     </div>
   </div>
+
+  <!-- INFO / ABOUT SECTION -->
+  <section class="info-section" id="info-section">
+    <div class="info-inner">
+      <div class="info-eyebrow-row">
+        <span class="info-eyebrow-num">About</span>
+        <div class="topbar-meta" style="font-size:10px">Worth a minute before you search</div>
+      </div>
+      <h2 class="info-heading">Four things <span>worth knowing</span> first</h2>
+      <p class="info-intro">A short, plain-language walkthrough of how this portal works, what it does to protect student data, and where to go if something's wrong.</p>
+
+      <div class="info-timeline">
+        <div class="info-rail"><div class="info-rail-fill" id="info-rail-fill"></div></div>
+
+        <div class="info-item">
+          <div class="info-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <div class="info-item-body">
+            <div class="info-item-tag">How it works</div>
+            <h3>Search by roll number, name, or place</h3>
+            <p>An exact roll number like <code>Y24CS3201</code> jumps straight to that record. A name, place, gender, or category instead returns a list you can browse and open.</p>
+          </div>
+        </div>
+
+        <div class="info-item warn">
+          <div class="info-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5z"/></svg>
+          </div>
+          <div class="info-item-body">
+            <div class="info-item-tag">Privacy &amp; disclaimer</div>
+            <h3>Sensitive fields stay hidden until you confirm</h3>
+            <p>Aadhaar number, mobile, and date of birth are blurred by default. Revealing one means you're confirming you're authorised to see it — please don't copy, screenshot, or share it outside official use.</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="info-item-body">
+            <div class="info-item-tag">Data accuracy</div>
+            <h3>Records can lag behind recent changes</h3>
+            <p>Information comes from institutional admission data, so very recent updates may not show yet. Spotted something that looks wrong or outdated? Flag it via the contact section.</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="info-item-body">
+            <div class="info-item-tag">Need access or help?</div>
+            <h3>The admin is one message away</h3>
+            <p>Access requests, corrections, or general questions about a record all go to the same place — message the admin directly on Instagram or Telegram.</p>
+            <a class="info-jump" onclick="document.querySelector('.sf-contact').scrollIntoView({behavior:'smooth',block:'center'})">
+              Jump to contact
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
-<div class="social-bar">
-  <span class="social-bar-label">Made by Kexer &nbsp;·&nbsp; Contact Admin</span>
-  <a class="social-link insta" href="https://instagram.com/kexer.vx" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-    @kexer.vx
-  </a>
-  <span class="social-sep">·</span>
-  <a class="social-link tg" href="https://t.me/Kexer_hub" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 14.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
-    @Kexer_hub
-  </a>
-</div>
+<!-- SOCIAL FOOTER -->
+<footer class="social-footer">
+
+  <!-- Top row: brand + social links -->
+  <div class="social-footer-top">
+    <div class="sf-brand">
+      <div class="sf-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="sf-brand-info">
+        <div class="sf-brand-name">Kexer</div>
+        <div class="sf-brand-tag">Student Portal · Academic Records</div>
+      </div>
+    </div>
+
+    <div class="sf-links">
+      <a href="https://instagram.com/kexer.vx" target="_blank" rel="noopener" class="sf-link instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        @kexer.vx
+      </a>
+      <a href="https://t.me/Kexer_hub" target="_blank" rel="noopener" class="sf-link telegram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M22 2L11 13"/>
+          <path d="M22 2L15 22 11 13 2 9l20-7z"/>
+        </svg>
+        @Kexer_hub
+      </a>
+      <a href="https://github.com/karim2762" target="_blank" rel="noopener" class="sf-link github">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+        </svg>
+        @karim2762
+      </a>
+    </div>
+  </div>
+
+  <!-- Contact Us card -->
+  <div class="sf-contact">
+    <div class="sf-contact-head">
+      <div class="sf-contact-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="sf-contact-text">
+        <strong>Contact Us</strong>
+        <span>Need access, spotted an error, or have a question? Reach the admin directly.</span>
+      </div>
+    </div>
+    <div class="sf-contact-acts">
+      <a href="https://instagram.com/kexer.vx" target="_blank" rel="noopener" class="sf-contact-link insta">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        Message on Instagram
+      </a>
+      <a href="https://t.me/Kexer_hub" target="_blank" rel="noopener" class="sf-contact-link tg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+        Message on Telegram
+      </a>
+    </div>
+  </div>
+
+  <!-- Bottom credit row -->
+  <div class="sf-bottom">
+    <div class="sf-copy">
+      <div class="sf-copy-dot"></div>
+      MADE BY KEXER &nbsp;·&nbsp; STUDENT RECORDS PORTAL
+    </div>
+    <div class="sf-insta-preview">
+      <div class="sf-insta-pulse"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="#e1306c" stroke="none"/>
+      </svg>
+      instagram.com/kexer.vx
+    </div>
+  </div>
+
+</footer>
 
 <script>
 // ── CONFIG ─────────────────────────────────────────
@@ -1165,8 +1618,17 @@ function showDetail(s){
   function section(title,keys){
     const ks=keys.filter(k=>s.hasOwnProperty(k));
     if(!ks.length)return'';
+    const isSensitiveSection=ks.some(k=>SENSITIVE.includes(k));
+    const disclaimer=isSensitiveSection?`
+      <div class="sens-disclaimer">
+        <div class="sens-disclaimer-icon">⚠️</div>
+        <div class="sens-disclaimer-text">
+          <strong>Restricted data — handle with care.</strong> This section contains government-issued ID, contact and date-of-birth details. View only if you are authorised to access this record, and do not copy, screenshot or share it outside official use.
+        </div>
+      </div>`:'';
     return `<div class="d-section">
       <div class="d-section-label">${title}</div>
+      ${disclaimer}
       <div class="d-grid">${ks.map(k=>field(k,s[k])).join('')}</div>
     </div>`;
   }
@@ -1227,6 +1689,12 @@ function confirmReveal(){
     const btn=wrap.querySelector('.reveal-btn');
     if(blur){blur.style.filter='none';blur.style.userSelect='text';}
     if(btn)btn.remove();
+    if(!wrap.parentElement.querySelector('.reveal-note')){
+      const note=document.createElement('div');
+      note.className='reveal-note';
+      note.textContent='Revealed — for authorised use only.';
+      wrap.parentElement.appendChild(note);
+    }
   }
   closeModal();
 }
@@ -1234,6 +1702,32 @@ document.getElementById('unlock-modal').addEventListener('click',function(e){if(
 
 // ── HELPERS ────────────────────────────────────────
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ── INFO SECTION SCROLL + REVEAL ────────────────────
+function scrollToInfo(){
+  const el=document.getElementById('info-section');
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+const infoItems=Array.from(document.querySelectorAll('.info-item'));
+const infoRailFill=document.getElementById('info-rail-fill');
+function updateRailFill(){
+  let last=-1;
+  infoItems.forEach((el,i)=>{if(el.classList.contains('in-view'))last=i;});
+  if(infoRailFill&&last>=0){
+    const pct=((last+0.5)/infoItems.length)*100;
+    infoRailFill.style.height=Math.min(pct,100)+'%';
+  }
+}
+const infoObserver=new IntersectionObserver((entries)=>{
+  entries.forEach((entry)=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+      updateRailFill();
+      infoObserver.unobserve(entry.target);
+    }
+  });
+},{threshold:0.35});
+document.querySelectorAll('.info-item,.info-eyebrow-row,.info-heading,.info-intro').forEach(c=>infoObserver.observe(c));
 </script>
 </body>
 </html>
